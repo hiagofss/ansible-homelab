@@ -1,5 +1,5 @@
 ---
-- name: Intall docker
+- name: Install docker
   hosts: all
   become: true
   vars:
@@ -32,3 +32,23 @@
         name: docker-ce
         state: present
         update_cache: true
+
+    - name: Add user group
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+    - name: Add usermod
+      ansible.builtin.user:
+        name: '{{ ansible_user_id }}'
+        groups: docker
+        append: true
+
+    - name: Apply newgrp command
+      ansible.builtin.command: 'newgrp docker'
+      register: newgrp_result
+      changed_when: false
+
+    - name: Mostrar saída do comando
+      ansible.builtin.debug:
+        msg: '{{ newgrp_result.stdout }}'

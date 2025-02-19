@@ -1,0 +1,48 @@
+---
+- name: Backup workspace
+  hosts: all
+  become: true
+  become_user: hiagofss
+  vars:
+    backup_folder: '{{ ansible_env.HOME }}/backups'
+    file_name: "workspace_backup_{{ now().strftime('%Y-%m-%d_%H-%M-%S') }}.zip"
+  tasks:
+    - name: Create backups folder
+      ansible.builtin.command: 'mkdir -p {{ ansible_env.HOME }}/backups'
+      register: create_backup_dir
+      changed_when: false
+
+    - name: Print result
+      ansible.builtin.debug:
+        msg: '{{ create_backup_dir.stdout }}'
+
+    - name: List folder
+      ansible.builtin.command: 'ls -la {{ ansible_env.HOME }}/'
+      register: list_dir
+      changed_when: false
+
+    - name: Print result
+      ansible.builtin.debug:
+        msg: '{{ list_dir.stdout }}'
+
+    - name: Run backup zip
+      ansible.builtin.command: 'ls -la {{ ansible_env.HOME }}/'
+      register: list_dir
+      changed_when: false
+
+    - name: Print result
+      ansible.builtin.debug:
+        msg: '{{ list_dir.stdout }}'
+
+    - name: Show generated file name
+      ansible.builtin.debug:
+        msg: 'Backup file: {{ backup_folder }}/{{ file_name }}'
+
+    - name: Run backup
+      ansible.builtin.command: 'zip -vr "{{ backup_folder }}/{{ file_name }}" "{{ ansible_env.HOME }}/workspace" -x "*.DS_Store" "*/node_modules*" "*/.sf*"'
+      register: bkp
+      changed_when: false
+
+    - name: Print result
+      ansible.builtin.debug:
+        msg: '{{ bkp.stdout }}'

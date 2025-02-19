@@ -5,4 +5,12 @@ all:
       ansible_user: "{{ lookup('env', 'ANSIBLE_USER') }}"
       ansible_password: "{{ lookup('env', 'ANSIBLE_PASSWORD') }}"
       ansible_connection: ssh
+      ansible_sudo_pass: "{{ lookup('env', 'ANSIBLE_PASSWORD') }}"
       ansible_ssh_private_key_file: ~/.ssh/id_rsa
+    rpi5:
+      ansible_host: "{{ lookup('env', 'ANSIBLE_RPI5_HOST') }}"
+      ansible_user: "{{ lookup('env', 'ANSIBLE_RPI5_USER') }}"
+      ansible_password: "{{ lookup('env', 'ANSIBLE_RPI5_PASSWORD') }}"
+      ansible_sudo_pass: "{{ lookup('env', 'ANSIBLE_RPI5_PASSWORD') }}"
+      ansible_connection: ssh
+      ansible_ssh_private_key_file: ~/.ssh/rpi5

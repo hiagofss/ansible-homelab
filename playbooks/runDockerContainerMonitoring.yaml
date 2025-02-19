@@ -1,0 +1,31 @@
+---
+- name: Run docker container
+  hosts: all
+  become: true
+  vars:
+    container_count: 4
+    default_container_name: docker
+    default_container_image: ubuntu
+    default_container_command: sleep 1d
+  tasks:
+    - name: Ensure Docker is running
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create a Docker volume for Uptime Kuma
+      community.docker.docker_volume:
+        name: uptime-kuma
+
+    - name: Run Uptime Kuma container
+      community.docker.docker_container:
+        name: uptime-kuma
+        image: louislam/uptime-kuma:1
+        state: started
+        restart_policy: always
+        ports:
+          - '3002:3001'
+        volumes:
+          - uptime-kuma:/app/data
+          - /var/run/docker.sock:/var/run/docker.sock
