@@ -1,2 +1,3 @@
 *.retry
 .env
+.DS_Store

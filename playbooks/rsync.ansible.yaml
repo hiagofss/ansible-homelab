@@ -1,0 +1,25 @@
+- name: Sync workspace to backup
+  hosts: all
+  become: true
+  become_user: hiagofss
+  vars:
+    sync_folder: '{{ ansible_env.HOME }}/sync'
+  tasks:
+    - name: Hostname
+      ansible.builtin.command: 'hostname'
+      register: hostname
+      changed_when: false
+    - name: List folder
+      ansible.builtin.command: 'ls -la {{ sync_folder }}/'
+      register: list_dir
+      changed_when: false
+    - name: Print result
+      ansible.builtin.debug:
+        msg: '{{ list_dir.stdout }}'
+    - name: Create backups folder
+      ansible.posix.synchronize:
+        mode: push
+        src: '{{ sync_folder }}/'
+        dest: '{{ ansible_env.HOME }}/backup/'
+        rsync_opts:
+          - '--update'

@@ -1,4 +1,3 @@
----
 - name: Run docker container
   hosts: all
   become: true
@@ -12,7 +11,6 @@
       community.docker.docker_image:
         name: '{{ default_container_image }}'
         source: pull
-
     - name: Create default containers
       community.docker.docker_container:
         name: '{{ default_container_name }}{{ item }}'
