@@ -1,0 +1,34 @@
+---
+- name: Provision the n8n server on OCI
+  hosts: all
+  become: true
+
+  roles:
+    - role: update
+      tags: [update]
+
+    - role: security
+      tags: [security]
+
+    - role: docker
+      tags: [docker, never]
+
+    - role: tailscale
+      tags: [tailscale, never]
+
+    - role: deploy
+      tags: [deploy, never]
+
+    - role: monitoring
+      tags: [monitoring, never]
+
+    - role: backup
+      tags: [backup, never]
+
+    - role: workspace_backup
+      become_user: "{{ workspace_user }}"
+      tags: [workspace_backup, never]
+
+    - role: workspace_sync
+      become_user: "{{ workspace_user }}"
+      tags: [workspace_sync, never]

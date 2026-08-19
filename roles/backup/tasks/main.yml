@@ -1,0 +1,28 @@
+---
+- name: Instalar restic
+  ansible.builtin.apt:
+    name: restic
+    state: present
+  when: backup_enabled | default(true)
+
+- name: Criar diretório de scripts
+  ansible.builtin.file:
+    path: /opt/scripts
+    state: directory
+    mode: "0750"
+  when: backup_enabled | default(true)
+
+- name: Gerar script de backup
+  ansible.builtin.template:
+    src: backup.sh.j2
+    dest: /opt/scripts/backup.sh
+    mode: "0750"
+  when: backup_enabled | default(true)
+
+- name: Agendar backup diário via cron
+  ansible.builtin.cron:
+    name: "backup stack n8n"
+    job: "/opt/scripts/backup.sh >> /var/log/stack-backup.log 2>&1"
+    minute: "{{ backup_schedule_cron.split(' ')[0] }}"
+    hour: "{{ backup_schedule_cron.split(' ')[1] }}"
+  when: backup_enabled | default(true)

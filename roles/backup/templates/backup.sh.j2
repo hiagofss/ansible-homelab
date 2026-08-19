@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Backup dos volumes Docker (n8n + postgres) para o OCI Object Storage via restic.
+set -euo pipefail
+
+export RESTIC_REPOSITORY="{{ restic_repository }}"
+export RESTIC_PASSWORD="{{ restic_password }}"
+export AWS_ACCESS_KEY_ID="{{ aws_access_key_id }}"
+export AWS_SECRET_ACCESS_KEY="{{ aws_secret_access_key }}"
+
+STACK_DIR="{{ stack_dir }}"
+
+# Garante que o repositório restic existe (idempotente)
+restic snapshots >/dev/null 2>&1 || restic init
+
+# Dump lógico do Postgres antes do backup dos arquivos (consistência)
+docker compose -f "${STACK_DIR}/docker-compose.yml" exec -T postgres \
+  pg_dump -U "{{ postgres_user }}" "{{ postgres_db }}" > /tmp/postgres_dump.sql
+
+# Backup dos volumes nomeados + dump do banco
+restic backup \
+  /var/lib/docker/volumes/stack_n8n-data \
+  /var/lib/docker/volumes/stack_postgres-data \
+  /tmp/postgres_dump.sql \
+  --tag n8n-stack
+
+rm -f /tmp/postgres_dump.sql
+
+# Retenção: mantém últimos 7 diários, 4 semanais, 6 mensais
+restic forget --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune

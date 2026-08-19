@@ -1,0 +1,14 @@
+---
+- name: Ensure sync source directory exists
+  ansible.builtin.file:
+    path: "{{ workspace_sync_source_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Push workspace sync folder to backup
+  ansible.posix.synchronize:
+    mode: push
+    src: "{{ workspace_sync_source_dir }}/"
+    dest: "{{ workspace_sync_dest_dir }}/"
+    rsync_opts:
+      - "--update"

@@ -1,0 +1,21 @@
+---
+- name: Ensure backup directory exists
+  ansible.builtin.file:
+    path: "{{ workspace_backup_dest_dir }}"
+    state: directory
+    mode: "0750"
+
+- name: Build backup file path
+  ansible.builtin.set_fact:
+    workspace_backup_file: "{{ workspace_backup_dest_dir }}/workspace_backup_{{ now().strftime('%Y-%m-%d_%H-%M-%S') }}.zip"
+
+- name: Archive workspace directory
+  ansible.builtin.command:
+    cmd: >-
+      zip -r "{{ workspace_backup_file }}" "{{ workspace_backup_source_dir }}"
+      -x "*.DS_Store" -x "*/node_modules*" -x "*/.sf*"
+  changed_when: true
+
+- name: Show backup result
+  ansible.builtin.debug:
+    msg: "Backup created at {{ workspace_backup_file }}"

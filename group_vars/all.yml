@@ -1,0 +1,29 @@
+# Variáveis não sensíveis. Segredos ficam em group_vars/vault.yml
+# (criado com `ansible-vault create group_vars/vault.yml`) e referenciados
+# aqui como {{ vault_xxx }}.
+
+workspace_user: hiagofss
+
+stack_dir: /opt/stack
+timezone: America/Sao_Paulo
+domain: hiagosouza.dev
+letsencrypt_email: voce@hiagosouza.dev
+
+# Token da Cloudflare com permissão Zone:DNS:Edit (usado pelo Traefik
+# para o desafio DNS-01 do Let's Encrypt)
+# cf_dns_api_token: "{{ vault_cf_dns_api_token }}"
+
+n8n_basic_auth_user: admin
+# n8n_basic_auth_password: "{{ vault_n8n_basic_auth_password }}"
+
+postgres_user: n8n
+postgres_db: n8n
+# postgres_password: "{{ vault_postgres_password }}"
+
+# --- Backup (restic -> OCI Object Storage, compatível S3) ---
+backup_enabled: true
+backup_schedule_cron: "0 3 * * *" # 03:00 todo dia
+restic_repository: "s3:https://<namespace>.compat.objectstorage.<region>.oraclecloud.com/<bucket>"
+# restic_password: "{{ vault_restic_password }}"
+# aws_access_key_id: "{{ vault_oci_s3_access_key }}"
+# aws_secret_access_key: "{{ vault_oci_s3_secret_key }}"

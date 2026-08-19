@@ -1,0 +1,4 @@
+---
+tailscale_container_name: tailscale
+tailscale_image: tailscale/tailscale:latest
+tailscale_state_volume: tailscale-state

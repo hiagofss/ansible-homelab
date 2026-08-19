@@ -1,0 +1,4 @@
+---
+monitoring_container_name: uptime-kuma
+monitoring_image: louislam/uptime-kuma:1
+monitoring_port: 3002

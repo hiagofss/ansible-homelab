@@ -1,0 +1,40 @@
+name: ansible-homelab
+services:
+  ansible:
+    image: quay.io/ansible/creator-ee:latest
+    container_name: ansible
+    volumes:
+      - ./playbooks:/ansible/playbooks
+      - ~/.ssh:/root/.ssh
+    working_dir: /ansible/playbooks
+    command: sleep infinity # Mantém o container rodando
+  awx:
+    image: quay.io/ansible/awx:latest
+    container_name: awx
+    restart: always
+    ports:
+      - '8080:80'
+      - '8443:443'
+    environment:
+      SECRET_KEY: '${AWX_SECRET_KEY}'
+      DATABASE_NAME: 'awx'
+      DATABASE_USER: 'awx'
+      DATABASE_PASSWORD: '${AWX_DB_PASSWORD}'
+      DATABASE_HOST: 'awx-db'
+      DATABASE_PORT: '5432'
+    depends_on:
+      - awx-db
+  awx-db:
+    image: postgres:13
+    container_name: awx-db
+    restart: always
+    environment:
+      POSTGRES_DB: 'awx'
+      POSTGRES_USER: 'awx'
+      POSTGRES_PASSWORD: '${AWX_DB_PASSWORD}'
+    volumes:
+      - awx-db-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+volumes:
+  awx-db-data:

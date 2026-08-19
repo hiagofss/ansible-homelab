@@ -1,0 +1,85 @@
+---
+- name: Update apt cache and packages
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: safe
+    cache_valid_time: 3600
+
+- name: Install security packages
+  ansible.builtin.apt:
+    name:
+      - ufw
+      - fail2ban
+      - unattended-upgrades
+      - curl
+      - gnupg
+      - ca-certificates
+    state: present
+
+- name: Configure timezone
+  timezone:
+    name: "{{ timezone }}"
+
+# - name: Disable password authentication in SSH
+#   lineinfile:
+#     path: /etc/ssh/sshd_config
+#     regexp: "^#?PasswordAuthentication"
+#     line: "PasswordAuthentication no"
+#   notify: restart sshd
+
+# - name: Desabilitar login root via SSH
+#   lineinfile:
+#     path: /etc/ssh/sshd_config
+#     regexp: "^#?PermitRootLogin"
+#     line: "PermitRootLogin no"
+#   notify: restart sshd
+
+- name: Setup UFW - SSH
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+
+- name: Setup UFW - HTTP
+  community.general.ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+
+- name: Setup UFW - HTTPS
+  community.general.ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+
+- name: Setup UFW - Default deny incoming
+  community.general.ufw:
+    state: enabled
+    policy: deny
+# - name: Enable fail2ban
+#   systemd:
+#     name: fail2ban
+#     state: started
+#     enabled: true
+
+# - name: Enable unattended updates
+#   copy:
+#     dest: /etc/apt/apt.conf.d/20auto-upgrades
+#     content: |
+#       APT::Periodic::Update-Package-Lists "1";
+#       APT::Periodic::Unattended-Upgrade "1";
+
+# - name: Check if swap file already exists
+#   command: swapon --show
+#   register: swap_check
+#   changed_when: false
+# - name: Create 2G swap file (for small instances)
+#   block:
+#     - command: fallocate -l 2G /swapfile
+#     - file: path=/swapfile mode='0600'
+#     - command: mkswap /swapfile
+#     - command: swapon /swapfile
+#     - lineinfile:
+#         path: /etc/fstab
+#         line: "/swapfile none swap sw 0 0"
+#   when: swap_check.stdout == ""

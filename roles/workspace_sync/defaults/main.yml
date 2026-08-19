@@ -1,0 +1,3 @@
+---
+workspace_sync_source_dir: "{{ ansible_env.HOME }}/sync"
+workspace_sync_dest_dir: "{{ ansible_env.HOME }}/backup"

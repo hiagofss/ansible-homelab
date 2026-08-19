@@ -1,0 +1,22 @@
+---
+- name: Pull Tailscale image
+  community.docker.docker_image:
+    name: "{{ tailscale_image }}"
+    source: pull
+
+- name: Run Tailscale container
+  community.docker.docker_container:
+    name: "{{ tailscale_container_name }}"
+    image: "{{ tailscale_image }}"
+    state: started
+    restart_policy: unless-stopped
+    capabilities:
+      - NET_ADMIN
+      - NET_RAW
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - "{{ tailscale_state_volume }}:/var/lib/tailscale"
+    env:
+      TS_AUTHKEY: "{{ lookup('env', 'TAILSCALE_AUTHKEY') }}"
+      TS_STATE_DIR: /var/lib/tailscale

@@ -1,0 +1,30 @@
+---
+- name: Criar diretório do stack
+  ansible.builtin.file:
+    path: "{{ stack_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0750"
+
+- name: Copiar docker-compose.yml
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../compose/docker-compose.yml"
+    dest: "{{ stack_dir }}/docker-compose.yml"
+    owner: "{{ ansible_user }}"
+    mode: "0640"
+
+- name: Gerar .env a partir das variáveis do Ansible
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ stack_dir }}/.env"
+    owner: "{{ ansible_user }}"
+    mode: "0600"
+
+- name: Subir/atualizar os containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ stack_dir }}"
+    pull: always
+    state: present
+  become: true
+  become_user: "{{ ansible_user }}"

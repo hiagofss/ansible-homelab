@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+dotenv:
+  - ".env"
+
+tasks:
+  default:
+    desc: Install required collections
+    cmds:
+      - ansible-galaxy collection install -r requirements.yaml
+    silent: true
+
+  ping:
+    desc: Ping all hosts
+    cmds:
+      - ansible -m ping all -vvvv
+    silent: true
+
+  inventory-list:
+    desc: List the inventory
+    cmds:
+      - ansible-inventory --list
+    silent: true
+
+  check:
+    desc: Dry-run the full playbook (update + security)
+    cmds:
+      - ansible-playbook playbook.yml --check --diff
+    silent: true
+
+  update:
+    desc: Update OS packages and reboot if the kernel changed
+    cmds:
+      - ansible-playbook playbook.yml --tags update
+    silent: true
+
+  security:
+    desc: Apply security hardening (firewall, packages, timezone)
+    cmds:
+      - ansible-playbook playbook.yml --tags security
+    silent: true
+
+  docker:
+    desc: Install the Docker engine
+    cmds:
+      - ansible-playbook playbook.yml --tags docker
+    silent: true
+
+  tailscale:
+    desc: Run the Tailscale container
+    cmds:
+      - ansible-playbook playbook.yml --tags tailscale
+    silent: true
+
+  deploy:
+    desc: Deploy the n8n stack via docker compose
+    cmds:
+      - ansible-playbook playbook.yml --tags deploy
+    silent: true
+
+  monitoring:
+    desc: Run the Uptime Kuma monitoring container
+    cmds:
+      - ansible-playbook playbook.yml --tags monitoring
+    silent: true
+
+  backup:
+    desc: Run the restic backup of the n8n stack
+    cmds:
+      - ansible-playbook playbook.yml --tags backup
+    silent: true
+
+  workspace-backup:
+    desc: Zip-backup the local ~/workspace folder
+    cmds:
+      - ansible-playbook playbook.yml --tags workspace_backup
+    silent: true
+
+  workspace-sync:
+    desc: Rsync the ~/sync folder to the backup folder
+    cmds:
+      - ansible-playbook playbook.yml --tags workspace_sync
+    silent: true

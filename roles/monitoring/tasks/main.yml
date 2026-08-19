@@ -1,0 +1,22 @@
+---
+- name: Ensure Docker is running
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Create Docker volume for Uptime Kuma
+  community.docker.docker_volume:
+    name: "{{ monitoring_container_name }}"
+
+- name: Run Uptime Kuma container
+  community.docker.docker_container:
+    name: "{{ monitoring_container_name }}"
+    image: "{{ monitoring_image }}"
+    state: started
+    restart_policy: always
+    ports:
+      - "{{ monitoring_port }}:3001"
+    volumes:
+      - "{{ monitoring_container_name }}:/app/data"
+      - /var/run/docker.sock:/var/run/docker.sock
