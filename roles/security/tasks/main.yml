@@ -52,6 +52,12 @@
     port: "443"
     proto: tcp
 
+- name: Setup UFW - Docker container port 2376
+  community.general.ufw:
+    rule: allow
+    port: "2376"
+    proto: tcp
+
 - name: Setup UFW - Default deny incoming
   community.general.ufw:
     state: enabled
